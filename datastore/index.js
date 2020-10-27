@@ -47,8 +47,27 @@ exports.readAll = (callback) => {
 
   // get contents of folder: fs.readdir(path[, options])
   // if no files, return empty array
-  // fs.readFile(`${exports.dataDir}/${id}.txt`, {encoding: 'utf-8'}, (err, text)
+  // must include a text field in response to client
+  // expect todo text instead of id
+  // each todo is stored in its own file
+  //
+  // Promise.all
+
+
   // return array of files
+
+  fs.readdir(exports.dataDir, 'utf8', (err, files) => {
+    if (err) {
+      throw new Error('Unable to read files.');
+    } else {
+      let dataFiles = files.map(file => {
+        fs.readFile(path.join(exports.dataDir, file), 'utf8', (err, fileData) => {
+          return {id: id, text: fileData};
+        });
+      });
+      callback(null, dataFiles);
+    }
+  });
 };
 
 
@@ -89,3 +108,19 @@ exports.initialize = () => {
     fs.mkdirSync(exports.dataDir);
   }
 };
+
+// id.txt
+// id.txt
+// id.txt
+// id.txt
+// id.txt
+
+// files.map(file => {
+//   fs.readFile(path.join(exports.dataDir, file), 'utf8', (err, fileData) => {
+//     if (err) {
+//       callback(new Error(`No item with id: ${id}`));
+//     } else {
+//       callback(null, {id: id, text: fileData});
+//     }
+//   });
+// });
