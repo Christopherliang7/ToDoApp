@@ -37,25 +37,46 @@ exports.readOne = (id, callback) => {
   });
 };
 
+// created asynchronous function for readOne
+const readOneAsync = id => {
+  var pathname = path.join(exports.dataDir, `${id}.txt`);
+  return new Promise((resolve, reject) => {
+    fs.readFile(pathname, 'utf8', (err, text) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({id, text});
+      }
+    });
+  });
+};
 
+// readAll function prior to promise implementation
+// exports.readAll = (callback) => {
+//   fs.readdir(exports.dataDir, (err, files) => {
+//     if (err) {
+//       throw new Error('Unable to read files.');
+//     } else {
+//       let dataFiles = files.map(file => {
+//         let id = file.slice(0, file.length - 4);
+//         return {id: id, text: id};
+//       });
+//       callback(null, dataFiles);
+//     }
+//   });
+// };
 
+// Copy of ReadAll to work with
 exports.readAll = (callback) => {
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
-
-  // read directory, takes in error and files
   fs.readdir(exports.dataDir, (err, files) => {
-    if (err) {
-      throw new Error('Unable to read files.');
-    } else {
-      let dataFiles = files.map(file => {
-        let id = file.slice(0, file.length - 4);
-        return {id: id, text: id};
-      });
-      callback(null, dataFiles);
-    }
+    // Apply Promise.all to data files
+    let dataFiles = files.map(file => {
+      let id = file.slice(0, file.length - 4);
+      return readOneAsync(id);
+    });
+    Promise.all(dataFiles).then((result) => {
+      callback(null, results);
+    });
   });
 };
 
