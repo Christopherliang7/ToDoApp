@@ -45,25 +45,14 @@ exports.readAll = (callback) => {
   // });
   // callback(null, data);
 
-  // get contents of folder: fs.readdir(path[, options])
-  // if no files, return empty array
-  // must include a text field in response to client
-  // expect todo text instead of id
-  // each todo is stored in its own file
-  //
-  // Promise.all
-
-
-  // return array of files
-
-  fs.readdir(exports.dataDir, 'utf8', (err, files) => {
+  // read directory, takes in error and files
+  fs.readdir(exports.dataDir, (err, files) => {
     if (err) {
       throw new Error('Unable to read files.');
     } else {
       let dataFiles = files.map(file => {
-        fs.readFile(path.join(exports.dataDir, file), 'utf8', (err, fileData) => {
-          return {id: id, text: fileData};
-        });
+        let id = file.slice(0, file.length - 4);
+        return {id: id, text: id};
       });
       callback(null, dataFiles);
     }
